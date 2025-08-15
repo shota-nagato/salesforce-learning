@@ -106,4 +106,41 @@ public with sharing class DMLSamples {
             throw new CustomDMLException('Failed');
         }
     }
+
+    /**
+     * @param accts
+     * @return List of updated records
+     */
+    public static List<Account> updateAccountViaKeywordInSystemMode(
+        List<Account> accts
+    ) {
+        for (Account acct : accts) {
+            acct.Name += ' Updated via keyword';
+        }
+        try {
+            update as system accts;
+        } catch (DmlException DMLe) {
+            throw new CustomDMLException('Failed');
+        }
+        return accts;
+    }
+
+    /**
+     * @param accts
+     * @return List of updated records
+     */
+    public static List<Account> updateAccountViaDatabaseMethod(
+        List<Account> accts,
+        System.AccessLevel accessLevel
+    ) {
+        for (Account acct : accts) {
+            acct.Name += ' Updated via keyword';
+        }
+        try {
+            Database.update(accts, accessLevel);
+        } catch (DmlException DMLe) {
+            throw new CustomDMLException('Failed');
+        }
+        return accts;
+    }
 }
