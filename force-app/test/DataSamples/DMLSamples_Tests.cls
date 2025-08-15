@@ -124,7 +124,7 @@ public class DMLSamples_Tests {
 
     @isTest
     static void testUpsertAccountViaUpsertKeywordInSystemModePositive() {
-        Account acct = TestDataHelpers.genAccountWithOptions(true, 'IR');
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
 
         Test.startTest();
         DMLSamples.upsertAccountViaUpsertKeywordInSystemMode(acct);
@@ -144,7 +144,7 @@ public class DMLSamples_Tests {
 
     @isTest
     static void testUpsertAccountViaUpsertKeywordInSystemModeNegative() {
-        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Ca');
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
         acct.Id = '0019A000008GTAYQA4'; //NOPMD
         Test.startTest();
         try {
@@ -161,7 +161,7 @@ public class DMLSamples_Tests {
 
     @isTest
     static void testUpsertAccountViaUpsertKeywordInUserModePositive() {
-        Account acct = TestDataHelpers.genAccountWithOptions(true, 'IR');
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
 
         Test.startTest();
         DMLSamples.upsertAccountViaUpsertKeywordInUserMode(acct);
@@ -181,7 +181,7 @@ public class DMLSamples_Tests {
 
     @isTest
     static void testUpsertAccountViaUpsertKeywordInUserModeNegative() {
-        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Ca');
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
         // Note: this is an intentionally invalid ID, used to trigger the failure case.
         acct.Id = '0019A000008GTAYQA4'; //NOPMD
         Test.startTest();
@@ -199,7 +199,7 @@ public class DMLSamples_Tests {
 
     @isTest
     static void testUpsertAccountViaDatabaseMethodInSystemModePositive() {
-        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Ca');
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
         Database.UpsertResult result;
         Test.startTest();
         result = DMLSamples.upsertAccountViaDatabaseMethod(
@@ -218,5 +218,82 @@ public class DMLSamples_Tests {
             resultingAccounts.size(),
             'We expect to find a single account with that name'
         );
+    }
+
+    @isTest
+    static void testUpdateAccountViaKeywordInSystemModePositive() {
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
+        insert acct;
+
+        Test.startTest();
+        DMLSamples.updateAccountViaKeywordInSystemMode(
+            new List<Account>{ acct }
+        );
+        Test.stopTest();
+
+        String checkAcct = [SELECT Name FROM Account WHERE Id = :acct.Id].Name;
+        System.Assert.isTrue(
+            checkAcct.containsIgnoreCase('updated'),
+            'Expected to find the keyword in the account name'
+        );
+    }
+
+    @isTest
+    static void testUpdateAcccountViaKeywordInSystemModeNegative() {
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
+        insert acct;
+        Test.startTest();
+        try {
+            // Note: this is an intentionally invalid ID used for triggering an error state
+            acct.Id = '0019A000008GTAYQA4'; //NOPMD
+            DMLSamples.updateAccountViaKeywordInSystemMode(
+                new List<Account>{ acct }
+            );
+            System.Assert.fail('Expected CustomDMLException');
+        } catch (DMLSamples.CustomDmlException theException) {
+            System.Assert.isTrue(
+                theException.getMessage().containsIgnoreCase('failed')
+            );
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testUpdateAccountViaDatabaseMethodInSystemModePositive() {
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
+        insert acct;
+
+        Test.startTest();
+        DMLSamples.updateAccountViaDatabaseMethod(
+            new List<Account>{ acct },
+            AccessLevel.SYSTEM_MODE
+        );
+        Test.stopTest();
+
+        String checkAcct = [SELECT Name FROM Account WHERE Id = :acct.Id].Name;
+        System.Assert.isTrue(
+            checkAcct.containsIgnoreCase('updated'),
+            'Expected to find the keyword updated in the account name'
+        );
+    }
+
+    @isTest
+    static void testUpdateAccountViaDatabaseMethodInSystemModeNegative() {
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
+        insert acct;
+        Test.startTest();
+        try {
+            acct.Id = '0019A000008GTAYQA4'; //NOPMD
+            DMLSamples.updateAccountViaDatabaseMethod(
+                new List<Account>{ acct },
+                AccessLevel.SYSTEM_MODE
+            );
+            System.Assert.fail('expected CustomDMLException');
+        } catch (DMLSamples.CustomDMLException theException) {
+            System.Assert.isTrue(
+                theException.getMessage().containsIgnoreCase('failed')
+            );
+        }
+        Test.stopTest();
     }
 }
