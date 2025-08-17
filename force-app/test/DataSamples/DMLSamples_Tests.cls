@@ -296,4 +296,44 @@ public class DMLSamples_Tests {
         }
         Test.stopTest();
     }
+
+    @isTest
+    static void testDeleteAccountViaKeywordInSystemModePositive() {
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
+        insert acct;
+
+        Test.startTest();
+        DMLSamples.deleteAccountViaKeywordInSystemMode(
+            new List<Account>{ acct }
+        );
+        Test.stopTest();
+        try {
+            String checkAcct = [SELECT Name FROM Account WHERE Id = :acct.Id]
+            .Name;
+            System.Assert.fail('expected QueryException');
+        } catch (QueryException qe) {
+            System.Assert.isTrue(
+                qe.getMessage()
+                    .containsIgnoreCase('list has no rows for assignment')
+            );
+        }
+    }
+
+    @isTest
+    static void testDeleteAccountViaKeywordInSystemModeNegative() {
+        Account acct = TestDataHelpers.genAccountWIthOptions(true, 'Japan');
+        insert acct;
+        delete acct;
+
+        Test.startTest();
+        try {
+            DMLSamples.deleteAccountViaKeywordInSystemMode(
+                new List<Account>{ acct }
+            );
+            System.Assert.fail('expected CustomDMLException');
+        } catch (DMLSamples.CustomDMLException cde) {
+            System.Assert.isTrue(cde.getMessage().containsIgnoreCase('failed'));
+        }
+        Test.stopTest();
+    }
 }

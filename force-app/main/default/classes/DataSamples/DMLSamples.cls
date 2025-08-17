@@ -143,4 +143,43 @@ public with sharing class DMLSamples {
         }
         return accts;
     }
+
+    /**
+     * @param accts
+     */
+    public static void deleteAccountViaKeywordInSystemMode(
+        List<Account> accts
+    ) {
+        try {
+            delete as system accts;
+        } catch (DmlException DMLe) {
+            throw new CustomDMLException('Failed');
+        }
+    }
+
+    /**
+     * @param accts
+     */
+    public static void deleteAccountViaKeywordInUserMode(List<Account> accts) {
+        try {
+            delete as user accts;
+        } catch (DmlException DMLe) {
+            System.debug(LoggingLevel.INFO, DMLe.getMessage());
+            throw new CustomDMLException('Failed');
+        }
+    }
+
+    /**
+     * @param accts
+     */
+    public static void deleteAccountViaDatabaseMethod(
+        List<Account> accts,
+        System.AccessLevel accessLevel
+    ) {
+        try {
+            Database.delete(accts, accessLevel);
+        } catch (DmlException DMLe) {
+            throw new CustomDMLException('Failed');
+        }
+    }
 }
