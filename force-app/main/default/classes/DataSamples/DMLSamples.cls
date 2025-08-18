@@ -182,4 +182,52 @@ public with sharing class DMLSamples {
             throw new CustomDMLException('Failed');
         }
     }
+
+    /**
+     * @param accts
+     * @return List of undeleted accounts
+     */
+    public static List<Account> undeletedAccountViaKeywordInSystemMode(
+        List<Account> accts
+    ) {
+        try {
+            undelete as system accts;
+        } catch (DmlException DMLe) {
+            System.debug(LoggingLevel.INFO, DMLe.getMessage());
+            throw new CustomDMLException('Failed');
+        }
+        return accts;
+    }
+
+    /**
+     * @param accts
+     * @return List of undeleted accounts
+     */
+    public static List<Account> undeleteAccountViaKeywordInUserMode(
+        List<Account> accts
+    ) {
+        try {
+            undelete as user accts;
+        } catch (DmlException DMLe) {
+            System.debug(LoggingLevel.INFO, DMLe.getMessage());
+            throw new CustomDMLException('Failed');
+        }
+        return accts;
+    }
+
+    /**
+     * @param accts
+     * @return list of undeleted accounts
+     */
+    public static List<Account> undeleteAccountViaDatabaseMethod(
+        List<Account> accts,
+        System.AccessLevel accessLevel
+    ) {
+        try {
+            Database.undelete(accts, accessLevel);
+        } catch (DmlException DMLe) {
+            throw new CustomDMLException('Failed');
+        }
+        return accts;
+    }
 }
