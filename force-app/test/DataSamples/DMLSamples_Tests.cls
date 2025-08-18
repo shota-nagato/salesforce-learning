@@ -336,4 +336,84 @@ public class DMLSamples_Tests {
         }
         Test.stopTest();
     }
+
+    @isTest
+    static void testUndeleteAccountViaKeywordInUserModePositive() {
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
+        insert acct;
+        delete acct;
+        Test.startTest();
+        DMLSamples.undeleteAccountViaKeywordInUserMode(
+            new List<Account>{ acct }
+        );
+        Test.stopTest();
+        List<Account> checkAcct = [
+            SELECT name
+            FROM Account
+            WHERE Id = :acct.Id
+        ];
+        System.Assert.areEqual(
+            1,
+            checkAcct.size(),
+            'Expected to find a single account'
+        );
+    }
+
+    @isTest
+    static void testUndeletedAccountViaKeywordInSystemModeNegative() {
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
+        insert acct;
+        Test.startTest();
+        try {
+            DMLSamples.undeletedAccountViaKeywordInSystemMode(
+                new List<Account>{ acct }
+            );
+            System.Assert.fail('Expected CustomDMLException');
+        } catch (DMLSamples.CustomDMLException cde) {
+            System.Assert.isTrue(cde.getMessage().containsIgnoreCase('failed'));
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testUndeleteAccountViaDatabaseMethodInSystemModePositive() {
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
+        insert acct;
+        delete acct;
+        Test.startTest();
+        DMLSamples.undeleteAccountViaDatabaseMethod(
+            new List<Account>{ acct },
+            AccessLevel.SYSTEM_MODE
+        );
+        Test.stopTest();
+        List<Account> checkAcct = [
+            SELECT name
+            FROM Account
+            WHERE Id = :acct.Id
+        ];
+        System.Assert.areEqual(
+            1,
+            checkAcct.size(),
+            'Expected to find a single account'
+        );
+    }
+
+    @isTest
+    static void testUndeleteAccountViaDatabaseMethodInSystemModeNegative() {
+        Account acct = TestDataHelpers.genAccountWithOptions(true, 'Japan');
+        insert acct;
+        Test.startTest();
+        try {
+            DMLSamples.undeleteAccountViaDatabaseMethod(
+                new List<Account>{ acct },
+                AccessLevel.SYSTEM_MODE
+            );
+            System.Assert.fail('Expected CustomDMLException');
+        } catch (DMLSamples.CustomDmlException theException) {
+            System.Assert.isTrue(
+                theException.getMessage().containsIgnoreCase('failed')
+            );
+        }
+        Test.stopTest();
+    }
 }
