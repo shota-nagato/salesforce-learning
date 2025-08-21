@@ -19,4 +19,20 @@ public with sharing class DynamicSOQLRecipes {
             AccessLevel.USER_MODE
         );
     }
+
+    public static List<Account> dynamicFieldsBindingSOQLQuery(Account acct) {
+        Map<String, Object> accountNameBind = new Map<String, Object>{
+            'accountName' => acct.Name
+        };
+        String accountName = acct.Name;
+        String queryString =
+            'SELECT Id, Name ' +
+            'FROM Account ' +
+            'WHERE Name = :accountName';
+        return Database.queryWithBinds(
+            queryString,
+            accountNameBind,
+            AccessLevel.USER_MODE
+        );
+    }
 }
