@@ -35,4 +35,14 @@ public with sharing class DynamicSOQLRecipes {
             AccessLevel.USER_MODE
         );
     }
+
+    @SuppressWarnings('PMD.ApexSOQLInjection')
+    public static List<Account> typecastDataIntelligently(
+        String numberOfRecords
+    ) {
+        String queryString =
+            'SELECT Id, Name FROM Account WHERE NumberOfEmployees > ' +
+            String.valueOf(Integer.valueOf(numberOfRecords));
+        return Database.query(queryString, AccessLevel.USER_MODE);
+    }
 }
