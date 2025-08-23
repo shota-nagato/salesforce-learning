@@ -66,4 +66,42 @@ private inherited sharing class DynamicSOQLRecipes_Tests {
             'Expected to find an Account'
         );
     }
+
+    @isTest
+    static void typecastDataIntelligentlyTestPositive() {
+        Account acct = [SELECT Name FROM Account LIMIT 1];
+        acct.NumberOfEmployees = 55;
+        update acct;
+
+        Test.startTest();
+        List<Account> results = DynamicSOQLRecipes.typecastDataIntelligently(
+            '50'
+        );
+        Test.stopTest();
+
+        System.Assert.areEqual(
+            1,
+            results.size(),
+            'Expected to find an Account'
+        );
+    }
+
+    @isTest
+    static void typecastDataIntelligentlyTestNoResult() {
+        Account acct = [SELECT Name FROM Account LIMIT 1];
+        acct.NumberOfEmployees = 55;
+        update acct;
+
+        Test.startTest();
+        List<Account> results = DynamicSOQLRecipes.typecastDataIntelligently(
+            '500'
+        );
+        Test.stopTest();
+
+        System.Assert.areEqual(
+            0,
+            results.size(),
+            'Expected to not find an Account'
+        );
+    }
 }
